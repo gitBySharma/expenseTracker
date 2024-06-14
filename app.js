@@ -15,13 +15,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
+//middleware to handle the new user signup
 app.post('/user/signup', async (req, res, next) => {
     const { name, email, password } = req.body;
     try {
-        const existingUser = await Users.findOne({where:{email: email}});
-        if(existingUser){
-            return res.status(400).json({error: "User already exists, enter a new email"});
+        const existingUser = await Users.findOne({ where: { email: email } });
+        if (existingUser) {
+            return res.status(400).json({ error: "User already exists, enter a new email" });
         }
         const data = await Users.create({
             name: name,
@@ -35,7 +35,27 @@ app.post('/user/signup', async (req, res, next) => {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
     }
-})
+});
+
+
+//middleware to handle existing user login
+app.post('/user/login', async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+        const user = await Users.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: "Incorrect email, User not found", success: false });
+        }
+        if (user.password === password) {
+            return res.status(200).json({ message: "User logged in successfully", success: true });
+        } else {
+            return res.status(401).json({ error: "Incorrect password", success: false });
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 
 
