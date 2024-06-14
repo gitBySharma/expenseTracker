@@ -20,6 +20,10 @@ signupForm.addEventListener('submit', (event) => {
         password: password.value
     };
 
+    //clearing the input fields
+    userName.value = "";
+    email.value = "";
+    password.value = "";
 
     axios.post('http://localhost:3000/user/signup', userData)
         .then((result) => {

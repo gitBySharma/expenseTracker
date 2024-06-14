@@ -18,6 +18,9 @@ loginForm.addEventListener('submit', (event) => {
         password: password.value
     };
 
+    //clearing the input fields
+    email.value = "";
+    password.value = "";
 
     axios.post('http://localhost:3000/user/login', userData)
         .then((result) => {
