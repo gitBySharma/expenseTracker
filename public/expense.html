@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Expense Tracker</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container-sm col">
+        <h1>
+            Expense
+            <small class="text-body-secondary">Tracker</small>
+        </h1><br>
+        <form id='expenseForm'>
+            <div>
+                <label for="expenseAmount"> Choose expense amount: </label>
+                <input id="expenseAmount" type="number" class="form-control bg-lightblue" required>
+            </div>
+            <br>
+            <div>
+                <label for="chooseCategory"> Choose a Category: </label>
+                <select class="chooseCategory form-select">
+                    <option value="movie">Movie</option>
+                    <option value="cafe">Cafe</option>
+                    <option value="drive">Drive</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="date">Date</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="picnic">Picnic</option>
+                </select>
+            </div>
+            <br>
+            <div>
+                <label for="expenseDescription"> Give Description: </label>
+                <input id="expenseDescription" type="text" class="form-control bg-lightblue" required>
+            </div>
+            <br>
+            <button type="submit" id="submit" class="btn btn-outline-success btn-sm"> Add Expense</button>
+        </form>
+
+        <ul class="list">
+
+        </ul>
+    </div>
+
+</body>
+<script src="expense.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
+
+</html>

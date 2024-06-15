@@ -6,6 +6,7 @@ const sequelize = require("./util/database.js");
 
 const Users = require("./models/users.js");
 const userController = require("./controllers/users.js");
+const expenseController = require("./controllers/expenses.js");
 
 const app = express();
 
@@ -22,6 +23,22 @@ app.post('/user/signup', userController.userSignup);
 
 //middleware to handle existing user login
 app.post('/user/login', userController.userLogin);
+
+
+//middleware to handle adding new expense
+app.post('/expense/addExpense', expenseController.postAddExpense);
+
+
+//middleware to handle retrieving existing expense
+app.get('/expense/getExpense', expenseController.getExpense);
+
+
+//middleware to handle deleting expense
+app.delete('/expense/deleteExpense/:id', expenseController.deleteExpense);
+
+
+//middleware to handle editing an existing expense
+app.put('/expense/editExpense/:id', expenseController.editExpense);
 
 
 

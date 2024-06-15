@@ -26,6 +26,7 @@ loginForm.addEventListener('submit', (event) => {
         .then((result) => {
             console.log(result);
             alert("User logged in successfully");
+            window.location.href = "C:/Users/Subhankar Sharma/Desktop/ExpenseTracker/public/expense.html";
         }).catch((err) => {
             console.log(err);
             if (err.response.data.error) {
