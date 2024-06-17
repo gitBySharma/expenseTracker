@@ -1,6 +1,8 @@
 const Users = require('../models/users.js');
 const bcrypt = require('bcrypt');
 
+const jwt = require('jsonwebtoken');
+
 //function handling user signup
 exports.userSignup = async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -27,6 +29,12 @@ exports.userSignup = async (req, res, next) => {
     }
 };
 
+//function to generate login token using jsonwebtoken library
+function generateAccessToken(id, name) {
+    return jwt.sign({ userId: id, name: name }, 'Tl1icy3VsMLRBt2g5BMnvVb9J4Ak9S1fj')
+}
+
+
 
 exports.userLogin = async (req, res, next) => {
     const { email, password } = req.body;
@@ -41,7 +49,8 @@ exports.userLogin = async (req, res, next) => {
         //case2 if the emailId is correct
         const match = await bcrypt.compare(password, user.password);  //matching the entered password with the hashed password stored in database
         if (match) {
-            return res.status(200).json({ message: "User logged in successfully", success: true });
+            return res.status(200).json({ data: user, message: "User logged in successfully", success: true, token: generateAccessToken(user.id, user.name) });
+
         } else {
             return res.status(401).json({ error: "Incorrect password", success: false });
         }

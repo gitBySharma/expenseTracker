@@ -4,9 +4,11 @@ const cors = require("cors");
 
 const sequelize = require("./util/database.js");
 
-const Users = require("./models/users.js");
+const User = require("./models/users.js");
+const Expense = require("./models/expenses.js");
 const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
+const userAuthentication  = require("./middleware/auth.js");
 
 const app = express();
 
@@ -26,21 +28,23 @@ app.post('/user/login', userController.userLogin);
 
 
 //middleware to handle adding new expense
-app.post('/expense/addExpense', expenseController.postAddExpense);
+app.post('/expense/addExpense',userAuthentication.authenticate, expenseController.postAddExpense);
 
 
 //middleware to handle retrieving existing expense
-app.get('/expense/getExpense', expenseController.getExpense);
+app.get('/expense/getExpense', userAuthentication.authenticate, expenseController.getExpense);
 
 
 //middleware to handle deleting expense
-app.delete('/expense/deleteExpense/:id', expenseController.deleteExpense);
+app.delete('/expense/deleteExpense/:id',userAuthentication.authenticate, expenseController.deleteExpense);
 
 
 //middleware to handle editing an existing expense
-app.put('/expense/editExpense/:id', expenseController.editExpense);
+app.put('/expense/editExpense/:id',userAuthentication.authenticate, expenseController.editExpense);
 
 
+User.hasMany(Expense, {foreignKey: 'userId'});
+Expense.belongsTo(User, {foreignKey: 'userId'});
 
 sequelize.sync()
     .then((result) => {

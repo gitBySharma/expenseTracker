@@ -4,7 +4,6 @@ const expense = document.getElementById('expenseAmount');
 const category = document.querySelector('.chooseCategory');
 const description = document.getElementById('expenseDescription');
 
-//const serverURL = "http://localhost:3000/expense/addExpense";
 
 //handling the add expense event
 submitButton.addEventListener("submit", function (event) {
@@ -17,7 +16,8 @@ submitButton.addEventListener("submit", function (event) {
     }
 
     //sending a post request to the backend
-    axios.post("http://localhost:3000/expense/addExpense", storeData)
+    const token = localStorage.getItem('token');
+    axios.post("http://localhost:3000/expense/addExpense", storeData, { headers: { "Authorization": token } })
         .then((result) => {
             console.log(result);
             displayDetails(result.data.expenseDetails);
@@ -92,7 +92,8 @@ function deleteExpense(deleteButton) {
     const listItem = deleteButton.closest("li");
     const id = listItem.dataset.id;  //getting the id of the expense to be deleted
 
-    axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`)
+    const token = localStorage.getItem("token");
+    axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`, { headers: { "Authorization": token } })
         .then((result) => {
             console.log(result);
             listToShow.removeChild(listItem);
@@ -105,7 +106,7 @@ function deleteExpense(deleteButton) {
 function editExpense(editData) {
     const listItem = editData.closest('li');
     const id = listItem.dataset.id;   //getting the id of the expense to be edited
-    
+
     //repopulating input fields
     const spans = listItem.querySelectorAll('span');
     expense.value = spans[0].innerText;
@@ -123,29 +124,32 @@ function editExpense(editData) {
     //save button functionality
     saveBtn.addEventListener("click", (event) => {
         event.preventDefault();
+        const token = localStorage.getItem("token");
         axios.put(`http://localhost:3000/expense/editExpense/${id}`, {
             expenseAmount: expense.value,
             expenseCategory: category.value,
             expenseDescription: description.value
-        }).then((result) => {
-            console.log(result);
-            submitButton.removeChild(saveBtn);
-            displayDetails(result.data.updatedExpense);
+        }, { headers: { "Authorization": token } })
+            .then((result) => {
+                console.log(result);
+                submitButton.removeChild(saveBtn);
+                displayDetails(result.data.updatedExpense);
 
-            //clearing the input  fields
-            expense.value = "";
-            category.value = "";
-            description.value = "";
+                //clearing the input  fields
+                expense.value = "";
+                category.value = "";
+                description.value = "";
 
-        }).catch(err => {
-            console.log(err);
-        })
+            }).catch(err => {
+                console.log(err);
+            })
     });
 }
 
 //function to display data on dashboard on page reload
 document.addEventListener("DOMContentLoaded", () => {
-    axios.get("http://localhost:3000/expense/getExpense")
+    const token = localStorage.getItem("token");
+    axios.get("http://localhost:3000/expense/getExpense", { headers: { "Authorization": token } })
         .then((result) => {
             console.log(result);
             if (result.data.expenseDetails) {
