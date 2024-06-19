@@ -23,7 +23,7 @@ exports.postAddExpense = async (req, res, next) => {
 exports.getExpense = async (req, res, next) => {
     try {
         const expense = await Expense.findAll({ where: { userId: req.user.id } });
-        res.status(200).json({ expenseDetails: expense });
+        res.status(200).json({ expenseDetails: expense, isPremiumUser: req.user.isPremiumUser });
     } catch (error) {
         console.log(error);
         res.status(404).json({ error: "Internal server error" });

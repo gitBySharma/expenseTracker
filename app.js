@@ -6,9 +6,14 @@ const sequelize = require("./util/database.js");
 
 const User = require("./models/users.js");
 const Expense = require("./models/expenses.js");
+const Premium = require("./models/premiumMembership.js");
+
 const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
+const premiumMembershipController = require("./controllers/premiumMembership.js");
+
 const userAuthentication  = require("./middleware/auth.js");
+const { FORCE } = require("sequelize/lib/index-hints");
 
 const app = express();
 
@@ -43,8 +48,21 @@ app.delete('/expense/deleteExpense/:id',userAuthentication.authenticate, expense
 app.put('/expense/editExpense/:id',userAuthentication.authenticate, expenseController.editExpense);
 
 
+//middleware to handle the order creation for the purchase of premium membership
+app.get('/purchase/premiumMembership',userAuthentication.authenticate, premiumMembershipController.purchasePremium);
+
+
+//middleware to handle successful payment
+app.post('/purchase/updateTransactionStatus', userAuthentication.authenticate, premiumMembershipController.updateTransactionStatus);
+
+
 User.hasMany(Expense, {foreignKey: 'userId'});
 Expense.belongsTo(User, {foreignKey: 'userId'});
+
+
+User.hasMany(Premium);
+Premium.belongsTo(User);
+
 
 sequelize.sync()
     .then((result) => {

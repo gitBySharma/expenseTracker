@@ -1,3 +1,5 @@
+//const Razorpay = require("razorpay");
+
 const submitButton = document.getElementById("expenseForm");
 const listToShow = document.querySelector('.list');
 const expense = document.getElementById('expenseAmount');
@@ -159,9 +161,63 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 console.log("No data found");
             }
+
+            const isPremiumUser = result.data.isPremiumUser;
+            handlePremiumButton(isPremiumUser);
         })
         .catch((error) => {
             console.log(error);
         });
 
-})
+});
+
+//handling the buy premium button - to display only for non premium users
+function handlePremiumButton(isPremiumUser){
+    const premiumButton  = document.getElementById("rzp-button1");
+    if(isPremiumUser){
+        premiumButton.style.display = "none";
+
+    } else {
+        premiumButton.style.display = "block";
+        
+    }
+}
+
+
+//handling the premium membership feature
+document.getElementById('rzp-button1').onclick = async function (event) {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+    const response = await axios.get('http://localhost:3000/purchase/premiumMembership', { headers: { 'Authorization': token } });
+    console.log(response);
+
+    var options = {
+        "key": response.data.key_id, // Enter the Key ID generated from the Dashboard
+        "order_id": response.data.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+
+        "handler": async function (response) {
+            await axios.post('http://localhost:3000/purchase/updateTransactionStatus', {
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id,
+            }, { headers: { 'Authorization': token } })
+
+
+            alert("You are a premium user now");
+        }
+    };
+
+    const rzp1 = new Razorpay(options);
+
+    rzp1.on('payment.failed', async function (response) {
+        console.log(response);
+        if (response.error) {
+            alert("Something went wrong");
+            await axios.post('http://localhost:3000/purchase/updateTransactionStatus', {
+                order_id: options.order_id,
+                payment_id: "payment_failed",
+            }, { headers: { 'Authorization': token } });   
+        }
+    });
+
+    rzp1.open();
+}
