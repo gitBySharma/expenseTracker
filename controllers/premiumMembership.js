@@ -1,6 +1,10 @@
 const Razorpay = require('razorpay');
+
 const Premium = require('../models/premiumMembership');
-const { where } = require('sequelize');
+const Users = require('../models/users.js');
+const Expense = require('../models/expenses.js');
+
+const sequelize = require('../util/database.js');
 
 require('dotenv').config();
 
@@ -76,6 +80,32 @@ exports.updateTransactionStatus = async (req, res, next) => {
             res.status(404).json({ success: false, message: "Premium membership not found" });
 
         }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" })
+    }
+};
+
+
+
+exports.showLeaderBoard = async (req, res, next) => {
+    try {
+        const leaderBoardData = await Users.findAll({
+            attributes: [
+                'id',
+                'name',
+                [sequelize.fn('SUM', sequelize.col('expensedetails.expenseAmount')), 'totalExpense']
+            ],
+            include: [{
+                model: Expense,
+                attributes: []
+            }],
+            group: ['users.id'],
+            order: [['totalExpense', 'DESC']]
+        });
+
+        res.status(200).json({ success: true, leaderBoardData: leaderBoardData });
 
     } catch (error) {
         console.log(error);

@@ -12,7 +12,7 @@ const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
 const premiumMembershipController = require("./controllers/premiumMembership.js");
 
-const userAuthentication  = require("./middleware/auth.js");
+const userAuthentication = require("./middleware/auth.js");
 const { FORCE } = require("sequelize/lib/index-hints");
 
 const app = express();
@@ -33,7 +33,7 @@ app.post('/user/login', userController.userLogin);
 
 
 //middleware to handle adding new expense
-app.post('/expense/addExpense',userAuthentication.authenticate, expenseController.postAddExpense);
+app.post('/expense/addExpense', userAuthentication.authenticate, expenseController.postAddExpense);
 
 
 //middleware to handle retrieving existing expense
@@ -41,23 +41,27 @@ app.get('/expense/getExpense', userAuthentication.authenticate, expenseControlle
 
 
 //middleware to handle deleting expense
-app.delete('/expense/deleteExpense/:id',userAuthentication.authenticate, expenseController.deleteExpense);
+app.delete('/expense/deleteExpense/:id', userAuthentication.authenticate, expenseController.deleteExpense);
 
 
 //middleware to handle editing an existing expense
-app.put('/expense/editExpense/:id',userAuthentication.authenticate, expenseController.editExpense);
+app.put('/expense/editExpense/:id', userAuthentication.authenticate, expenseController.editExpense);
 
 
 //middleware to handle the order creation for the purchase of premium membership
-app.get('/purchase/premiumMembership',userAuthentication.authenticate, premiumMembershipController.purchasePremium);
+app.get('/purchase/premiumMembership', userAuthentication.authenticate, premiumMembershipController.purchasePremium);
 
 
 //middleware to handle successful payment
 app.post('/purchase/updateTransactionStatus', userAuthentication.authenticate, premiumMembershipController.updateTransactionStatus);
 
 
-User.hasMany(Expense, {foreignKey: 'userId'});
-Expense.belongsTo(User, {foreignKey: 'userId'});
+//middleware to handle displaying the leaderBoard
+app.get('/leaderBoard/showLeaderboard', userAuthentication.authenticate, premiumMembershipController.showLeaderBoard);
+
+
+User.hasMany(Expense, { foreignKey: 'userId' });
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
 
 User.hasMany(Premium);

@@ -1,5 +1,3 @@
-//const Razorpay = require("razorpay");
-
 const submitButton = document.getElementById("expenseForm");
 const listToShow = document.querySelector('.list');
 const expense = document.getElementById('expenseAmount');
@@ -162,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("No data found");
             }
 
-            const isPremiumUser = result.data.isPremiumUser;
+            const isPremiumUser = result.data.isPremiumUser; //|| localStorage.getItem("isPremiumUser") === "true";
             handlePremiumButton(isPremiumUser);
         })
         .catch((error) => {
@@ -172,14 +170,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //handling the buy premium button - to display only for non premium users
-function handlePremiumButton(isPremiumUser){
-    const premiumButton  = document.getElementById("rzp-button1");
-    if(isPremiumUser){
+function handlePremiumButton(isPremiumUser) {
+    const premiumButton = document.getElementById("rzp-button1");
+    const premiumMessage = document.getElementById("premiumMessage");
+    //const leaderboard = document.getElementById("leaderboard");
+
+    if (isPremiumUser) {
         premiumButton.style.display = "none";
+        premiumMessage.style.display = "block";
+        // leaderboard.style.display = "block";
 
     } else {
         premiumButton.style.display = "block";
-        
+        premiumMessage.style.display = "none";
+        // leaderboard.style.display = "none";
+
     }
 }
 
@@ -201,8 +206,15 @@ document.getElementById('rzp-button1').onclick = async function (event) {
                 payment_id: response.razorpay_payment_id,
             }, { headers: { 'Authorization': token } })
 
+            //updating local storage with premium status
+            if (response.razorpay_payment_id) {
+                localStorage.setItem("isPremiumUser", true);
+
+            }
 
             alert("You are a premium user now");
+
+            handlePremiumButton(true);  //updating the dashboard to show the premium message
         }
     };
 
@@ -215,7 +227,7 @@ document.getElementById('rzp-button1').onclick = async function (event) {
             await axios.post('http://localhost:3000/purchase/updateTransactionStatus', {
                 order_id: options.order_id,
                 payment_id: "payment_failed",
-            }, { headers: { 'Authorization': token } });   
+            }, { headers: { 'Authorization': token } });
         }
     });
 
