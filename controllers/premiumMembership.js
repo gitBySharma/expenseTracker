@@ -95,7 +95,8 @@ exports.showLeaderBoard = async (req, res, next) => {
             attributes: [
                 'id',
                 'name',
-                [sequelize.fn('SUM', sequelize.col('expensedetails.expenseAmount')), 'totalExpense']
+                //[sequelize.fn('SUM', sequelize.col('expensedetails.expenseAmount')), 'totalExpense']
+                'totalExpense'
             ],
             include: [{
                 model: Expense,

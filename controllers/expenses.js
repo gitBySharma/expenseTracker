@@ -1,5 +1,6 @@
 const { where } = require("sequelize");
 const Expense = require("../models/expenses");
+const Users = require('../models/users');
 const jwt = require('jsonwebtoken');
 
 exports.postAddExpense = async (req, res, next) => {
@@ -9,8 +10,22 @@ exports.postAddExpense = async (req, res, next) => {
             expenseAmount: expenseAmount,
             expenseCategory: expenseCategory,
             expenseDescription: expenseDescription,
-            userId: req.user.id
+            userId: req.user.id,
         });
+
+        //updating the totalExpense for each user when a new expense is added
+        const user = await Users.findOne({ where: { id: req.user.id } });
+        let totalExpense = parseInt(user.totalExpense);
+        if (isNaN(totalExpense)) {
+            totalExpense = 0;
+        }
+        totalExpense += parseFloat(expenseAmount);
+
+        await Users.update({
+            totalExpense: totalExpense
+        }, { where: { id: req.user.id } });
+
+
         res.status(200).json({ expenseDetails: data });
 
     } catch (error) {
@@ -41,6 +56,20 @@ exports.deleteExpense = async (req, res, next) => {
         } else {
             res.status(404).json({ message: "User not found" });
         }
+
+        //updating the totalExpense when a expense is deleted
+        const user = await Users.findOne({ where: { id: req.user.id } });
+
+        const existingTotalExpense = parseInt(user.totalExpense);
+        if (isNaN(existingTotalExpense)) {
+            existingTotalExpense = 0;
+        }
+        const newTotalExpense = existingTotalExpense - (parseFloat(expense.expenseAmount));
+
+        await Users.update({
+            totalExpense: newTotalExpense
+        }, { where: { id: req.user.id } });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -54,8 +83,27 @@ exports.editExpense = async (req, res, next) => {
     try {
         const expense = await Expense.findOne({ where: { id: expenseId, userId: req.user.id } });
         if (expense) {
-            await expense.update({ expenseAmount, expenseCategory, expenseDescription });
+            //calculating the difference between old and new expense amounts
+            const oldExpenseAmount = parseFloat(expense.expenseAmount);
+            const newExpenseAmount = parseFloat(expenseAmount);
+            const expenseDifference = newExpenseAmount - oldExpenseAmount;
+
+            await expense.update({ expenseAmount, expenseCategory, expenseDescription });   //updating the expense
+
+            //updating the totalExpense for the user
+            const user = await Users.findOne({ where: { id: req.user.id } });
+            let totalExpense = parseInt(user.totalExpense);
+            if (isNaN(totalExpense)) {
+                totalExpense = 0;
+            }
+            totalExpense += expenseDifference;
+
+            await Users.update({
+                totalExpense: totalExpense
+            }, { where: { id: req.user.id } });
+
             res.status(200).json({ updatedExpense: expense });
+
         } else {
             res.status(404).json({ error: "Expense not found" });
         }

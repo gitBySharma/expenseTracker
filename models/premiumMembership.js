@@ -4,7 +4,7 @@ const sequelize = require("../util/database.js");
 
 
 const Premium = sequelize.define('premium', {
-    id:{
+    id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
