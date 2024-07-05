@@ -1,9 +1,12 @@
 const { where } = require("sequelize");
+const sequelize = require('../util/database.js');
 const Expense = require("../models/expenses");
 const Users = require('../models/users');
 const jwt = require('jsonwebtoken');
 
+
 exports.postAddExpense = async (req, res, next) => {
+    const t = await sequelize.transaction();
     const { expenseAmount, expenseCategory, expenseDescription } = req.body;
     try {
         const data = await Expense.create({
@@ -11,7 +14,7 @@ exports.postAddExpense = async (req, res, next) => {
             expenseCategory: expenseCategory,
             expenseDescription: expenseDescription,
             userId: req.user.id,
-        });
+        }, {transaction: t});
 
         //updating the totalExpense for each user when a new expense is added
         const user = await Users.findOne({ where: { id: req.user.id } });
@@ -23,13 +26,15 @@ exports.postAddExpense = async (req, res, next) => {
 
         await Users.update({
             totalExpense: totalExpense
-        }, { where: { id: req.user.id } });
+        }, { where: { id: req.user.id }, transaction: t });
 
+        await t.commit();
 
         res.status(200).json({ expenseDetails: data });
 
     } catch (error) {
         console.log(error);
+        await t.rollback();
         res.status(404).json({ error: "Internal server error" });
     }
 };
@@ -47,11 +52,12 @@ exports.getExpense = async (req, res, next) => {
 
 
 exports.deleteExpense = async (req, res, next) => {
+    const t = await sequelize.transaction();
     const expenseId = req.params.id;
     try {
         const expense = await Expense.findByPk(expenseId);
         if (expense) {
-            await Expense.destroy({ where: { id: expenseId, userId: req.user.id } });
+            await Expense.destroy({ where: { id: expenseId, userId: req.user.id }, transaction: t});
             res.status(200).json({ message: "User deleted successfully" });
         } else {
             res.status(404).json({ message: "User not found" });
@@ -68,16 +74,21 @@ exports.deleteExpense = async (req, res, next) => {
 
         await Users.update({
             totalExpense: newTotalExpense
-        }, { where: { id: req.user.id } });
+        }, { where: { id: req.user.id }, transaction: t});
+
+        t.commit();
 
     } catch (error) {
         console.log(error);
+        t.rollback();
+
         res.status(500).json({ error: "Internal server error" });
     }
 };
 
 
 exports.editExpense = async (req, res, next) => {
+    const t = await sequelize.transaction();
     const expenseId = req.params.id;
     const { expenseAmount, expenseCategory, expenseDescription } = req.body;
     try {
@@ -88,7 +99,7 @@ exports.editExpense = async (req, res, next) => {
             const newExpenseAmount = parseFloat(expenseAmount);
             const expenseDifference = newExpenseAmount - oldExpenseAmount;
 
-            await expense.update({ expenseAmount, expenseCategory, expenseDescription });   //updating the expense
+            await expense.update({ expenseAmount, expenseCategory, expenseDescription }, {transaction: t});   //updating the expense
 
             //updating the totalExpense for the user
             const user = await Users.findOne({ where: { id: req.user.id } });
@@ -100,15 +111,20 @@ exports.editExpense = async (req, res, next) => {
 
             await Users.update({
                 totalExpense: totalExpense
-            }, { where: { id: req.user.id } });
+            }, { where: { id: req.user.id }, transaction: t});
+
+            t.commit();
 
             res.status(200).json({ updatedExpense: expense });
 
         } else {
+            t.rollback();
             res.status(404).json({ error: "Expense not found" });
         }
     } catch (error) {
         console.log(error);
+        t.rollback();
+
         res.status(500).json({ error: "Internal server error" });
     }
 };

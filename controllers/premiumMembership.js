@@ -60,7 +60,7 @@ exports.updateTransactionStatus = async (req, res, next) => {
     try {
         const { payment_id, order_id } = req.body;
 
-        const premiumMembership = await Premium.findOne({ where: { orderId: order_id } })
+        const premiumMembership = await Premium.findOne({ where: { orderId: order_id } });
 
         if (premiumMembership) {
 
