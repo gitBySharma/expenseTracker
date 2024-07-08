@@ -35,3 +35,10 @@ loginForm.addEventListener('submit', (event) => {
             }
         });
 });
+
+
+const forgotPasswordBtn = document.getElementById("forgotPassword");
+forgotPasswordBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.location.href = "C:/Users/Subhankar Sharma/Desktop/ExpenseTracker/public/forgotPassword.html";
+})

@@ -11,6 +11,7 @@ const Premium = require("./models/premiumMembership.js");
 const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
 const premiumMembershipController = require("./controllers/premiumMembership.js");
+const forgotPasswordController = require('./controllers/forgotPassword.js');
 
 const userAuthentication = require("./middleware/auth.js");
 const { FORCE } = require("sequelize/lib/index-hints");
@@ -58,6 +59,9 @@ app.post('/purchase/updateTransactionStatus', userAuthentication.authenticate, p
 
 //middleware to handle displaying the leaderBoard
 app.get('/leaderBoard/showLeaderboard', userAuthentication.authenticate, premiumMembershipController.showLeaderBoard);
+
+
+app.post('/password/forgotPassword', forgotPasswordController.forgotPassword);
 
 
 User.hasMany(Expense, { foreignKey: 'userId' });
