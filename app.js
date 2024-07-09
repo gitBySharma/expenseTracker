@@ -7,6 +7,7 @@ const sequelize = require("./util/database.js");
 const User = require("./models/users.js");
 const Expense = require("./models/expenses.js");
 const Premium = require("./models/premiumMembership.js");
+const ForgotPassword = require('./models/forgotPassword.js');
 
 const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
@@ -61,7 +62,14 @@ app.post('/purchase/updateTransactionStatus', userAuthentication.authenticate, p
 app.get('/leaderBoard/showLeaderboard', userAuthentication.authenticate, premiumMembershipController.showLeaderBoard);
 
 
+//middleware to handle forgot password (sends a reset link to users email)
 app.post('/password/forgotPassword', forgotPasswordController.forgotPassword);
+
+//middleware to handle forgot password request
+app.get('/password/resetPassword/:id', forgotPasswordController.resetPassword);
+
+//middleware to handle updating the password in database
+app.post('/password/updatePassword/:id', forgotPasswordController.updatePassword);
 
 
 User.hasMany(Expense, { foreignKey: 'userId' });
@@ -70,6 +78,9 @@ Expense.belongsTo(User, { foreignKey: 'userId' });
 
 User.hasMany(Premium);
 Premium.belongsTo(User);
+
+User.hasMany(ForgotPassword);
+ForgotPassword.belongsTo(User);
 
 
 sequelize.sync()
