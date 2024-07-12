@@ -8,6 +8,7 @@ const User = require("./models/users.js");
 const Expense = require("./models/expenses.js");
 const Premium = require("./models/premiumMembership.js");
 const ForgotPassword = require('./models/forgotPassword.js');
+const DownloadUrls = require('./models/DownloadUrls.js');
 
 const userController = require("./controllers/users.js");
 const expenseController = require("./controllers/expenses.js");
@@ -72,6 +73,12 @@ app.get('/password/resetPassword/:id', forgotPasswordController.resetPassword);
 app.post('/password/updatePassword/:id', forgotPasswordController.updatePassword);
 
 
+app.get('/user/download', userAuthentication.authenticate, expenseController.downloadExpense);
+
+
+
+app.get('/user/downloadHistory', userAuthentication.authenticate, expenseController.downloadHistory);
+
 
 User.hasMany(Expense, { foreignKey: 'userId' });
 Expense.belongsTo(User, { foreignKey: 'userId' });
@@ -82,6 +89,9 @@ Premium.belongsTo(User);
 
 User.hasMany(ForgotPassword);
 ForgotPassword.belongsTo(User);
+
+User.hasMany(DownloadUrls);
+DownloadUrls.belongsTo(User);
 
 
 sequelize.sync()
