@@ -72,6 +72,7 @@ app.get('/password/resetPassword/:id', forgotPasswordController.resetPassword);
 app.post('/password/updatePassword/:id', forgotPasswordController.updatePassword);
 
 
+
 User.hasMany(Expense, { foreignKey: 'userId' });
 Expense.belongsTo(User, { foreignKey: 'userId' });
 
