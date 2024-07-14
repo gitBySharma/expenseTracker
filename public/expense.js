@@ -4,6 +4,13 @@ const expense = document.getElementById('expenseAmount');
 const category = document.querySelector('.chooseCategory');
 const description = document.getElementById('expenseDescription');
 
+const previousPageBtn = document.getElementById("previousPage");
+const nextPageBtn = document.getElementById("nextPage");
+const currentPageSpan = document.getElementById("currentPage");
+
+let currentPage = 1;
+const limit = 5;
+
 
 //handling the add expense event
 submitButton.addEventListener("submit", function (event) {
@@ -146,28 +153,93 @@ function editExpense(editData) {
     });
 }
 
-//function to display data on dashboard on page reload
-document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("token");
-    axios.get("http://localhost:3000/expense/getExpense", { headers: { "Authorization": token } })
-        .then((result) => {
-            console.log(result);
-            if (result.data.expenseDetails) {
-                result.data.expenseDetails.forEach(expense => {
-                    displayDetails(expense);
-                })
-            } else {
-                console.log("No data found");
-            }
 
-            const isPremiumUser = result.data.isPremiumUser; //|| localStorage.getItem("isPremiumUser") === "true";
-            handlePremiumButton(isPremiumUser);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+//function handling the pagination
+async function fetchExpenses(page) {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:3000/expense/getExpense?page=${page}&limit=${limit}`, { headers: { "Authorization": token } });
+
+        listToShow.innerHTML = "";
+        if (response.data.expenses) {
+            response.data.expenses.forEach(expense => {
+                displayDetails(expense);
+            });
+            currentPageSpan.textContent = page;
+            currentPage = page;
+            handlePaginationButtons(response.data.totalPages);
+
+        } else {
+            alert("No data found");
+        }
+
+        const isPremiumUser = response.data.isPremiumUser; //|| localStorage.getItem("isPremiumUser") === "true";
+        handlePremiumButton(isPremiumUser);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+//function handling the pagination buttons
+function handlePaginationButtons(totalPages) {
+    if (currentPage <= 1) {
+        previousPageBtn.disabled = true;
+    } else {
+        previousPageBtn.disabled = false;
+    }
+
+    if (currentPage >= totalPages) {
+        nextPageBtn.disabled = true;
+    } else {
+        nextPageBtn.disabled = false;
+    }
+}
+
+
+previousPageBtn.addEventListener('click', (event) => {
+    if (currentPage > 1) {
+        fetchExpenses(currentPage - 1);
+    }
+});
+
+nextPageBtn.addEventListener('click', () => {
+    fetchExpenses(currentPage + 1);
 
 });
+
+
+
+
+//function to display data on dashboard on page reload
+document.addEventListener("DOMContentLoaded", () => {
+
+    fetchExpenses(currentPage);
+
+    // const token = localStorage.getItem("token");
+    // axios.get("http://localhost:3000/expense/getExpense", { headers: { "Authorization": token } })
+    //     .then((result) => {
+    //         console.log(result);
+    //         if (result.data.expenseDetails) {
+    //             result.data.expenseDetails.forEach(expense => {
+    //                 displayDetails(expense);
+    //             })
+    //         } else {
+    //             console.log("No data found");
+    //         }
+
+    //         const isPremiumUser = result.data.isPremiumUser; //|| localStorage.getItem("isPremiumUser") === "true";
+    //         handlePremiumButton(isPremiumUser);
+    //     })
+    //     .catch((error) => {
+    //         console.log(error);
+    //     });
+
+});
+
+
+
 
 //handling the buy premium button - to display only for non premium users
 function handlePremiumButton(isPremiumUser) {

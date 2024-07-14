@@ -45,9 +45,25 @@ exports.postAddExpense = async (req, res, next) => {
 
 
 exports.getExpense = async (req, res, next) => {
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     try {
-        const expense = await Expense.findAll({ where: { userId: req.user.id } });
-        res.status(200).json({ expenseDetails: expense, isPremiumUser: req.user.isPremiumUser });
+        const { count, rows } = await Expense.findAndCountAll({
+            where: { userId: req.user.id },
+            limit: limit,
+            offset: offset
+        });
+        res.status(200).json({
+            totalItems: count,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+            expenses: rows,
+            isPremiumUser: req.user.isPremiumUser
+        });
+
     } catch (error) {
         console.log(error);
         res.status(404).json({ error: "Internal server error" });
