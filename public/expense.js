@@ -7,9 +7,19 @@ const description = document.getElementById('expenseDescription');
 const previousPageBtn = document.getElementById("previousPage");
 const nextPageBtn = document.getElementById("nextPage");
 const currentPageSpan = document.getElementById("currentPage");
+const rowsPerPageSelect = document.getElementById("rowsPerPage");
 
 let currentPage = 1;
-const limit = 5;
+let limit = parseInt(localStorage.getItem('rowsPerPage')) || 5;
+
+rowsPerPageSelect.value = limit;
+
+rowsPerPageSelect.addEventListener('change', (event) => {
+
+    localStorage.setItem('rowsPerPage', event.target.value);
+    window.location.reload();
+
+});
 
 
 //handling the add expense event
