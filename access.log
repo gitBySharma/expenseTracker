@@ -1,0 +1,2 @@
+::1 - - [15/Jul/2024:03:34:48 +0000] "GET /expense/getExpense?page=1&limit=5 HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+::1 - - [15/Jul/2024:03:35:35 +0000] "GET /leaderBoard/showLeaderboard HTTP/1.1" 200 215 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"

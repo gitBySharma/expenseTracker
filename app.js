@@ -1,6 +1,12 @@
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const router = require("router");
+const morgan  = require("morgan");
+
+require('dotenv').config();
 
 const sequelize = require("./util/database.js");
 
@@ -10,79 +16,34 @@ const Premium = require("./models/premiumMembership.js");
 const ForgotPassword = require('./models/forgotPassword.js');
 const DownloadUrls = require('./models/DownloadUrls.js');
 
-const userController = require("./controllers/users.js");
-const expenseController = require("./controllers/expenses.js");
-const premiumMembershipController = require("./controllers/premiumMembership.js");
-const forgotPasswordController = require('./controllers/forgotPassword.js');
+const userRoutes = require("./routes/user.js");
+const expenseRoutes = require("./routes/expense.js");
+const premiumFeatureRoutes = require("./routes/premiumFeature.js");
 
-const userAuthentication = require("./middleware/auth.js");
 const { FORCE } = require("sequelize/lib/index-hints");
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-//middleware to handle the new user signup
-app.post('/user/signup', userController.userSignup);
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'});
+app.use(morgan("combined", {stream: accessLogStream}));
 
 
-//middleware to handle existing user login
-app.post('/user/login', userController.userLogin);
+app.use(userRoutes);
+app.use(expenseRoutes);
+app.use(premiumFeatureRoutes);
 
 
-//middleware to handle adding new expense
-app.post('/expense/addExpense', userAuthentication.authenticate, expenseController.postAddExpense);
-
-
-//middleware to handle retrieving existing expense
-app.get('/expense/getExpense', userAuthentication.authenticate, expenseController.getExpense);
-
-
-//middleware to handle deleting expense
-app.delete('/expense/deleteExpense/:id', userAuthentication.authenticate, expenseController.deleteExpense);
-
-
-//middleware to handle editing an existing expense
-app.put('/expense/editExpense/:id', userAuthentication.authenticate, expenseController.editExpense);
-
-
-//middleware to handle the order creation for the purchase of premium membership
-app.get('/purchase/premiumMembership', userAuthentication.authenticate, premiumMembershipController.purchasePremium);
-
-
-//middleware to handle successful payment
-app.post('/purchase/updateTransactionStatus', userAuthentication.authenticate, premiumMembershipController.updateTransactionStatus);
-
-
-//middleware to handle displaying the leaderBoard
-app.get('/leaderBoard/showLeaderboard', userAuthentication.authenticate, premiumMembershipController.showLeaderBoard);
-
-
-//middleware to handle forgot password (sends a reset link to users email)
-app.post('/password/forgotPassword', forgotPasswordController.forgotPassword);
-
-//middleware to handle forgot password request
-app.get('/password/resetPassword/:id', forgotPasswordController.resetPassword);
-
-//middleware to handle updating the password in database
-app.post('/password/updatePassword/:id', forgotPasswordController.updatePassword);
-
-
-app.get('/user/download', userAuthentication.authenticate, expenseController.downloadExpense);
-
-
-
-app.get('/user/downloadHistory', userAuthentication.authenticate, expenseController.downloadHistory);
-
-
+//database relations
 User.hasMany(Expense, { foreignKey: 'userId' });
 Expense.belongsTo(User, { foreignKey: 'userId' });
-
 
 User.hasMany(Premium);
 Premium.belongsTo(User);
@@ -96,8 +57,8 @@ DownloadUrls.belongsTo(User);
 
 sequelize.sync()
     .then((result) => {
-        app.listen(3000);
-        console.log("Server is live in port 3000");
+        app.listen(process.env.PORT);
+        console.log(`Server is live in port ${process.env.PORT}`);
     }).catch((err) => {
         console.log(err);
     });

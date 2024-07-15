@@ -279,8 +279,8 @@ document.getElementById('rzp-button1').onclick = async function (event) {
     console.log(response);
 
     var options = {
-        "key": response.data.key_id, // Enter the Key ID generated from the Dashboard
-        "order_id": response.data.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "key": response.data.key_id, 
+        "order_id": response.data.order.id,
 
         "handler": async function (response) {
             await axios.post('http://localhost:3000/purchase/updateTransactionStatus', {
