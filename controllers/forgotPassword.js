@@ -60,7 +60,7 @@ exports.resetPassword = async (req, res, next) => {
     try {
         const id = req.params.id;
         const forgotPasswordRequest = await ForgotPassword.findOne({ where: { id: id } });
-        console.log(forgotPasswordRequest);
+        //console.log(forgotPasswordRequest);
 
         if (forgotPasswordRequest) {
             await forgotPasswordRequest.update({ active: false });
@@ -93,8 +93,8 @@ exports.resetPassword = async (req, res, next) => {
 
 
 exports.updatePassword = async (req, res, next) => {
-    console.log(req.body.newPassword);
-    console.log(req.params.id);
+    // console.log(req.body.newPassword);
+    // console.log(req.params.id);
 
     try {
         const resetPasswordRequest = await ForgotPassword.findOne({ where: { id: req.params.id } });
@@ -104,7 +104,41 @@ exports.updatePassword = async (req, res, next) => {
             if (user) {
                 const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);  //encrypting the password
                 await user.update({ password: hashedPassword });
-                res.status(201).json({ message: "Password Successfully updated" });
+                res.status(201).send(`
+                    <html>
+                    <head>
+                        <title>Password Updated</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                                margin: 0;
+                                background-color: #f0f0f0;
+                            }
+                            .message {
+                                background-color: #d4edda;
+                                border-color: #c3e6cb;
+                                color: #155724;
+                                padding: 20px;
+                                border-radius: 5px;
+                                text-align: center;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="message">
+                            <h2>Password successfully updated.</h2>
+                            <p>Log into your expense tracker account again.</p>
+                        </div>
+                    </body>
+                    </html>
+                `);
+
+                //res.status(200).json({Message: "Password successfully updated"});
 
             } else {
                 res.status(400).json({ message: "User not found" });

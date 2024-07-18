@@ -29,6 +29,7 @@ signupForm.addEventListener('submit', (event) => {
         .then((result) => {
             console.log(result);
             alert("User created successfully");
+            window.location.href = "login.html";
         }).catch((err) => {
             console.log(err);
             if (err.response.data.error) {

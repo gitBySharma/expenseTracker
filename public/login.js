@@ -27,7 +27,7 @@ loginForm.addEventListener('submit', (event) => {
             console.log(result);
             alert("User logged in successfully");
             localStorage.setItem("token", result.data.token);
-            window.location.href = "C:/Users/Subhankar Sharma/Desktop/ExpenseTracker/public/expense.html";
+            window.location.href = "expense.html";
         }).catch((err) => {
             console.log(err);
             if (err.response.data.error) {
@@ -40,5 +40,5 @@ loginForm.addEventListener('submit', (event) => {
 const forgotPasswordBtn = document.getElementById("forgotPassword");
 forgotPasswordBtn.addEventListener('click', (event) => {
     event.preventDefault();
-    window.location.href = "C:/Users/Subhankar Sharma/Desktop/ExpenseTracker/public/forgotPassword.html";
+    window.location.href = "forgotPassword.html";
 })

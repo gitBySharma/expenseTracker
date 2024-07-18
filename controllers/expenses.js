@@ -2,9 +2,6 @@ const { where } = require("sequelize");
 const sequelize = require('../util/database.js');
 const Expense = require("../models/expenses");
 const Users = require('../models/users');
-const jwt = require('jsonwebtoken');
-const AWS = require("aws-sdk");
-const DownloadUrls = require('../models/DownloadUrls.js');
 
 require('dotenv').config();
 
@@ -146,69 +143,5 @@ exports.editExpense = async (req, res, next) => {
         t.rollback();
 
         res.status(500).json({ error: "Internal server error" });
-    }
-};
-
-
-async function uploadToS3(data, fileName) {
-    const s3bucket = new AWS.S3({
-        accessKeyId: process.env.IAM_USER_KEY,
-        secretAccessKey: process.env.IAM_USER_SECRET,
-        Bucket: "iam1expensetracker"
-    });
-
-    var params = {
-        Bucket: "iam1expensetracker",
-        Key: fileName,
-        Body: data,
-        ACL: "public-read"
-    }
-
-    try {
-        const response = await s3bucket.upload(params).promise();   //.promise() returns a promise
-        //console.log("Success", response);
-        return response.Location;
-
-    } catch (error) {
-        console.log("Error", error);
-
-    }
-}
-
-
-exports.downloadExpense = async (req, res, next) => {
-    try {
-        const expenses = await Expense.findAll({ where: { userId: req.user.id } });
-        const stringifiedExpenses = JSON.stringify(expenses);
-        const fileName = `Expenses${req.user.id}/${new Date().toISOString()}.txt`;
-        const fileUrl = await uploadToS3(stringifiedExpenses, fileName);
-
-        await DownloadUrls.create({   //storing the history od downloads
-            fileUrl: fileUrl,
-            userId: req.user.id
-        })
-        res.status(201).json({ fileUrl, success: true });
-
-    } catch (error) {
-        console.log("Error", error);
-        res.status(500).json({ Error: "Something went wrong", success: false });
-    }
-};
-
-
-
-exports.downloadHistory = async (req, res, next) => {
-    try {
-        const history = await DownloadUrls.findAll({ where: { userId: req.user.id } });
-        if (history) {
-            res.status(201).json({ history, success: true });
-
-        } else {
-            res.status(400).json({ Error: "No download history found" });
-        }
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ Error: "Something went wrong", success: false });
     }
 };
