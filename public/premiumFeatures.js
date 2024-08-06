@@ -8,7 +8,7 @@ showLeaderboard.addEventListener('click', async (event) => {
         leaderboard.style.display = "block";
         const token = localStorage.getItem('token');
 
-        const response = await axios.get('http://localhost:3000/leaderBoard/showLeaderboard', { headers: { 'Authorization': token } });
+        const response = await axios.get('leaderBoard/showLeaderboard', { headers: { 'Authorization': token } });
         //console.log(response);
 
         //leaderBoardDiv.innerHTML = '';   //clear previous content
@@ -43,7 +43,7 @@ downloadReportBtn.addEventListener('click', async (event) => {
     event.preventDefault();
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/user/download', { headers: { 'Authorization': token } });
+        const response = await axios.get('user/download', { headers: { 'Authorization': token } });
 
         if (response.status === 201) {
             let a = document.createElement("a");
@@ -72,7 +72,7 @@ downloadHistory.addEventListener('click', async (event) => {
 
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/user/downloadHistory', { headers: { Authorization: token } });
+        const response = await axios.get('user/downloadHistory', { headers: { Authorization: token } });
 
         downloadUrlsSpan.style.display = "block";
 

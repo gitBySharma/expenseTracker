@@ -17,7 +17,7 @@ signupForm.addEventListener('submit', (event) => {
     email.value = "";
     password.value = "";
 
-    axios.post('http://localhost:3000/user/signup', userData)
+    axios.post('user/signup', userData)
         .then((result) => {
             alert("Signed up successfully");
             //hide sign-up modal
@@ -54,7 +54,7 @@ loginForm.addEventListener('submit', (event) => {
     email.value = "";
     password.value = "";
 
-    axios.post('http://localhost:3000/user/login', userData)
+    axios.post('user/login', userData)
         .then((result) => {
             alert("User logged in successfully");
             localStorage.setItem("token", result.data.token);
