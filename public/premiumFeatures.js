@@ -86,7 +86,7 @@ downloadHistory.addEventListener('click', async (event) => {
             let a = document.createElement("a");
             a.href = url;
             a.textContent = url;
-            a.className = "btn btn-outline-primary align-items-center btn-sm me-2 mb-2";
+            a.className = "btn btn-outline-primary shadow-sm align-items-center btn-sm me-2 mb-2";
             a.style.display = "inline-block";
             centeredContainer.appendChild(a);
         });

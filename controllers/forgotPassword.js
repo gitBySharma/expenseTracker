@@ -135,6 +135,13 @@ exports.updatePassword = async (req, res, next) => {
                             <p>Log into your expense tracker account again.</p>
                         </div>
                     </body>
+                    <script>
+                            document.addEventListener('DOMContentLoaded', () => {
+                                setTimeout(() => {
+                                    window.location.href = "http://localhost:3000";
+                                }, 3000); // 3000 milliseconds = 3 seconds
+                            });
+                    </script>
                     </html>
                 `);
 
