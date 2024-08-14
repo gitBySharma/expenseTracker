@@ -138,8 +138,8 @@ exports.updatePassword = async (req, res, next) => {
                     <script>
                             document.addEventListener('DOMContentLoaded', () => {
                                 setTimeout(() => {
-                                    window.location.href = "http://localhost:3000";
-                                }, 3000); // 3000 milliseconds = 3 seconds
+                                    window.location.href = "${process.env.WEBSITE}";
+                                }, 3000);
                             });
                     </script>
                     </html>
