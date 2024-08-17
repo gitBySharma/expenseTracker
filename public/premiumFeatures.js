@@ -11,7 +11,9 @@ showLeaderboard.addEventListener('click', async (event) => {
         const response = await axios.get('leaderBoard/showLeaderboard', { headers: { 'Authorization': token } });
         //console.log(response);
 
-        //leaderBoardDiv.innerHTML = '';   //clear previous content
+        leaderBoardDiv.innerHTML = `<div  class="text-center mb-3">
+            <span id="leaderboard" class="fw-bold fs-4">Leader Board</span>
+        </div>`;   //clear previous content
 
         const centeredContainer = document.createElement("div");
         centeredContainer.className = 'container d-flex justify-content-center';
@@ -77,7 +79,9 @@ downloadHistory.addEventListener('click', async (event) => {
         downloadUrlsSpan.style.display = "block";
 
         const fileUrls = response.data.history.map(item => item.fileUrl);
-        //downloadUrlsDiv.innerHTML = '';
+        downloadUrlsDiv.innerHTML = `<div class="text-center mb-2">
+            <span id="downloadUrls" class="fw-bold fs-4">Previous Reports</span>
+        </div>`;
 
         const centeredContainer = document.createElement("div");
         centeredContainer.className = 'container d-flex justify-content-center flex-wrap';

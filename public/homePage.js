@@ -1,4 +1,11 @@
+//signup logic
+
 const signupForm = document.getElementById("signUpForm");
+const signupBtn = document.getElementById("signupBtn");
+const passwordInput = document.getElementById('signUpPassword');
+const passwordHelp = document.getElementById('passwordHelp');
+
+signupBtn.disabled = true; //initially disable the button
 
 signupForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -6,37 +13,68 @@ signupForm.addEventListener('submit', (event) => {
     const email = document.getElementById('signUpEmail');
     const password = document.getElementById('signUpPassword');
 
-    const userData = {
-        name: userName.value,
-        email: email.value,
-        password: password.value
-    };
+    const isValidPassword = validatePassword(password.value);
 
-    //clearing the input fields
-    userName.value = "";
-    email.value = "";
-    password.value = "";
+    if (isValidPassword) {
+        const userData = {
+            name: userName.value,
+            email: email.value,
+            password: password.value
+        };
 
-    axios.post('user/signup', userData)
-        .then((result) => {
-            alert("Signed up successfully");
-            //hide sign-up modal
-            const signUpModal = new bootstrap.Modal(document.getElementById('signUpModal'));
-            signUpModal.hide();
-            // Show sign-in modal
-            const signInModal = new bootstrap.Modal(document.getElementById('signInModal'));
-            signInModal.show();
-        }).catch((err) => {
-            console.log(err);
-            if (err.response.data.error) {
-                alert(err.response.data.error);
-            }
-        });
+        //clearing the input fields
+        userName.value = "";
+        email.value = "";
+        password.value = "";
+
+        axios.post('user/signup', userData)
+            .then((result) => {
+                alert("Signed up successfully");
+                //hide sign-up modal
+                const signUpModal = new bootstrap.Modal(document.getElementById('signUpModal'));
+                signUpModal.hide();
+                // Show sign-in modal
+                const signInModal = new bootstrap.Modal(document.getElementById('signInModal'));
+                signInModal.show();
+
+                userName.value = "";
+                email.value = "";
+                password.value = "";
+
+            }).catch((err) => {
+                console.log(err);
+                if (err.response.data.error) {
+                    alert(err.response.data.error);
+                }
+            });
+    } else {
+        passwordHelp.textContent = "Enter valid password";
+        signupBtn.disabled = true;
+    }
 
 });
 
+passwordInput.addEventListener('keyup', () => {
+    const isValidPassword = validatePassword(passwordInput.value);
+    if (isValidPassword) {
+        passwordHelp.textContent = "";
+        signupBtn.disabled = false;
+
+    } else {
+        passwordHelp.textContent = "Enter valid password";
+        signupBtn.disabled = true;
+    }
+});
+
+function validatePassword(password) {
+    const hasMinimumLength = password.length >= 8;
+    const hasNumber = /\d/.test(password);
+    return hasMinimumLength && hasNumber;
+}
 
 
+
+//login logic
 const loginForm = document.getElementById("signInForm");
 
 loginForm.addEventListener('submit', (event) => {

@@ -1,4 +1,5 @@
 const submitButton = document.getElementById("expenseForm");
+const addExpenseBtn = document.getElementById('submit');
 const listToShow = document.querySelector('.list');
 const expense = document.getElementById('expenseAmount');
 const category = document.querySelector('.chooseCategory');
@@ -20,6 +21,13 @@ rowsPerPageSelect.addEventListener('change', (event) => {
     window.location.reload();
 
 });
+
+
+//function handling logout
+function logout(){
+    localStorage.removeItem('token');
+    window.location.href = 'homePage.html';
+}
 
 
 //handling the add expense event
@@ -108,6 +116,8 @@ function displayDetails(storeData) {
     listToShow.appendChild(newDetails);
 }
 
+let isEditInProgress = false;  //variable to track edit status, initially set to false
+
 //handling the delete event
 listToShow.addEventListener("click", function (event) {
     event.preventDefault();
@@ -120,7 +130,12 @@ listToShow.addEventListener("click", function (event) {
 listToShow.addEventListener('click', function (event) {
     event.preventDefault();
     if (event.target.classList.contains('edit_btn')) {
-        editExpense(event.target);
+        if (!isEditInProgress) {  //check if any edit is in progress or not
+            disableEditButtons();
+            addExpenseBtn.style.display = 'none';
+            editExpense(event.target);
+            isEditInProgress = true;
+        }
     }
 })
 
@@ -172,8 +187,8 @@ function editExpense(editData) {
             expenseDescription: description.value
         }, { headers: { "Authorization": token } })
             .then((result) => {
-                console.log(result);
                 submitButton.removeChild(saveBtn);
+                addExpenseBtn.style.display = 'block';
                 displayDetails(result.data.updatedExpense);
 
                 //clearing the input  fields
@@ -181,9 +196,28 @@ function editExpense(editData) {
                 category.value = "";
                 description.value = "";
 
+                enableEditButtons();
+                isEditInProgress = false;
+
             }).catch(err => {
                 console.log(err);
             })
+    });
+}
+
+//function to disable edit buttons
+function disableEditButtons() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {  //disable all the edit buttons
+        button.disabled = true;
+    });
+}
+
+//function to enable edit buttons
+function enableEditButtons() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.disabled = false;  //enable all the edit buttons
     });
 }
 
@@ -201,7 +235,7 @@ async function fetchExpenses(page) {
             });
             currentPageSpan.textContent = page;
             currentPage = page;
-            handlePaginationButtons(response.data.totalPages);
+            handlePaginationButtons(response.data.totalPages, response.data.totalItems);
 
         } else {
             alert("No data found");
@@ -217,7 +251,14 @@ async function fetchExpenses(page) {
 
 
 //function handling the pagination buttons
-function handlePaginationButtons(totalPages) {
+function handlePaginationButtons(totalPages, totalExpenses) {
+
+    if (totalExpenses <= 5 || totalExpenses <= parseInt(rowsPerPageSelect.value)) {  //hiding pagination buttons
+        const paginationBtn = document.getElementsByClassName('pagination');
+        paginationBtn[0].style.display = 'none';
+        return;
+    }
+
     if (currentPage <= 1) {
         previousPageBtn.disabled = true;
     } else {
@@ -248,28 +289,7 @@ nextPageBtn.addEventListener('click', () => {
 
 //function to display data on dashboard on page reload
 document.addEventListener("DOMContentLoaded", () => {
-
     fetchExpenses(currentPage);
-
-    // const token = localStorage.getItem("token");
-    // axios.get("http://localhost:3000/expense/getExpense", { headers: { "Authorization": token } })
-    //     .then((result) => {
-    //         console.log(result);
-    //         if (result.data.expenseDetails) {
-    //             result.data.expenseDetails.forEach(expense => {
-    //                 displayDetails(expense);
-    //             })
-    //         } else {
-    //             console.log("No data found");
-    //         }
-
-    //         const isPremiumUser = result.data.isPremiumUser; //|| localStorage.getItem("isPremiumUser") === "true";
-    //         handlePremiumButton(isPremiumUser);
-    //     })
-    //     .catch((error) => {
-    //         console.log(error);
-    //     });
-
 });
 
 
