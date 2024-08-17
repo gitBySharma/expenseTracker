@@ -1,3 +1,5 @@
+//main starting file - entry point of the project
+
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
