@@ -76,6 +76,7 @@ exports.resetPassword = async (req, res, next) => {
                 <form action="/password/updatePassword/${id}" method="post">
                     <label for="newPassword">Enter New password</label>
                     <input name="newPassword" type="password" required></input>
+                    <small>Minimum 8 characters long and must contain at least one number.</small> <br>
                     <button>Reset Password</button>
                 </form>
             </html>`)
@@ -93,9 +94,6 @@ exports.resetPassword = async (req, res, next) => {
 
 
 exports.updatePassword = async (req, res, next) => {
-    // console.log(req.body.newPassword);
-    // console.log(req.params.id);
-
     try {
         const resetPasswordRequest = await ForgotPassword.findOne({ where: { id: req.params.id } });
         if (resetPasswordRequest) {
